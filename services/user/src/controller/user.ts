@@ -1,0 +1,231 @@
+import axios from "axios";
+import { AuthenticatedRequest } from "../middleware/auth.js";
+import { createBuffer } from "../utils/buffer.js";
+import { sql } from "../utils/db.js";
+import ErrorHandler from "../utils/ErrorHandler.js";
+import { TryCatch } from "../utils/TryCatch.js";
+
+
+export const MyProfile=TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user =req.user;
+
+    return res.status(200).json({user})
+    
+})
+
+export const GetUserprofile = TryCatch(async(req,res)=>{
+    const {userId} = req.params;
+
+    const users = await sql`
+                SELECT u.user_id,u.name,u.email,u.phone_number,u.role,u.bio,u.resume,
+                u.resume_public_id,u.profile_pic,u.profile_pic_public_id,u.subscription,
+                ARRAY_AGG(s.name) FILTER (WHERE s.name IS NOT NULL) as skills
+                FROM users u LEFT JOIN user_skills us ON u.user_id = us.user_id
+                LEFT JOIN skills s ON us.skill_id = s.skill_id
+                WHERE u.user_id = ${userId} GROUP BY u.user_id;
+    
+    `;
+    if(users.length===0){
+        throw new ErrorHandler(404,"User Not Found");
+    }
+    const user = users[0];
+    user.skills = user.skills || [];
+
+    res.status(200).json({user});
+})
+
+
+export const updateUserProfile = TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = req.user;
+    if(!user){
+        throw new ErrorHandler(401,"Unauthorized");
+    }
+
+    const {name,phoneNumber,bio} = req.body;
+    const newName =name || user.name;
+    const newPhoneNumber = phoneNumber || user.phone_number;
+    const newBio = bio || user.bio;
+
+    const updatedUsers = await sql`
+        UPDATE users SET name=${newName}, phone_number=${newPhoneNumber}, bio=${newBio}
+        WHERE user_id=${user.user_id}
+        RETURNING user_id, name, email, phone_number, role, bio, resume,
+        resume_public_id, profile_pic, profile_pic_public_id, subscription
+    `;  
+
+    res.status(200).json({message:'profile updated Successfully',user:updatedUsers[0]});
+})
+
+
+export const UpdateProfilePic= TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = req.user;
+
+    if(!user){
+        throw new ErrorHandler(401,"Unauthorized");
+    }
+    const file = req.file;
+    if(!file){
+        throw new ErrorHandler(400,"No file uploaded");
+    }
+    const oldPublicId = user.profile_pic_public_id;
+
+    const fileBuffer = createBuffer(file)
+
+    const {data : uploadResult} = await axios.post<{url: string; public_id: string}>(`${process.env.MEDIA_SERVICE_URL}/api/utils/upload`,{buffer:fileBuffer.content,public_id:oldPublicId})
+    const updatedUsers = await sql`
+        UPDATE users SET profile_pic =${uploadResult.url}, profile_pic_public_id=${uploadResult.public_id}
+        WHERE user_id=${user.user_id}
+        RETURNING user_id, name, email, phone_number, role, bio, resume,
+        resume_public_id, profile_pic, profile_pic_public_id, subscription
+    `;
+
+    return res.status(200).json({message:'Profile Picture Updated Successfully',user:updatedUsers[0]});
+})
+
+export const UpdateResume= TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = req.user;
+
+    if(!user){
+        throw new ErrorHandler(401,"Unauthorized");
+    }
+    const file = req.file;
+    if(!file){
+        throw new ErrorHandler(400,"No file uploaded");
+    }
+    const oldPublicId = user.resume_public_id;
+
+    const fileBuffer = createBuffer(file)
+
+    const {data : uploadResult} = await axios.post<{url: string; public_id: string}>(`${process.env.MEDIA_SERVICE_URL}/api/utils/upload`,{buffer:fileBuffer.content,public_id:oldPublicId})
+    const updatedUsers = await sql`
+        UPDATE users SET resume =${uploadResult.url}, resume_public_id=${uploadResult.public_id}
+        WHERE user_id=${user.user_id}
+        RETURNING user_id, name, email, phone_number, role, bio, resume,
+        resume_public_id, profile_pic, profile_pic_public_id, subscription
+    `;
+
+    return res.status(200).json({message:'Resume Updated Successfully',user:updatedUsers[0]});
+})
+
+
+export const addSkillTouser=TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = req.user;
+    const {skillName} = req.body;
+    if(!skillName || skillName.trim() === ''){
+        throw new ErrorHandler(400,"Skill name is required");
+    }
+    let wasSkillAdded = false;
+    try {
+        await sql`BEGIN`;
+        const users = await sql`SELECT user_id from users WHERE user_id=${user?.user_id}`;
+        if(users.length===0){
+            throw new ErrorHandler(404,"User Not Found");
+        }
+        const [skill] =await sql`INSERT INTO skills (name) VALUES (${skillName.trim()}) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING skill_id`;
+        const skillId = skill.skill_id;
+
+        const insertionResult = await sql`INSERT INTO user_skills (user_id, skill_id) VALUES (${user?.user_id}, ${skillId}) ON CONFLICT (user_id,skill_id) DO NOTHING RETURNING user_id`;
+        if(insertionResult.length>0){
+            wasSkillAdded = true;
+        }
+        await sql`COMMIT`;
+    } catch (error) {
+        await sql`ROLLBACK`;
+        throw error;
+    }
+    if(!wasSkillAdded){
+        return res.status(200).json({message:'Skill already exists in your profile'});
+    }
+    return res.status(200).json({message:`Skill ${skillName.trim()} added to your profile successfully`});
+
+})
+
+export const removeSkillFromUser=TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = req.user;
+    if(!user){
+        throw new ErrorHandler(401,"Unauthorized");
+    }
+    const {skillName} = req.body;
+    if(!skillName || skillName.trim() === ''){
+        throw new ErrorHandler(400,"Skill name is required");
+    }
+    const result =await sql`DELETE from user_skills WHERE user_id=${user.user_id} AND skill_id = (SELECT skill_id FROM skills WHERE name=${skillName.trim()}) RETURNING user_id`;
+    if(result.length===0){
+        throw new ErrorHandler(404,`Skill ${skillName.trim()} not found in your profile`);
+    }
+    return res.status(200).json({message:`Skill ${skillName.trim()} removed from your profile successfully`});
+})
+
+
+export const applyForJob=TryCatch(async(req:AuthenticatedRequest,res)=>{
+    const user = req.user;
+    if(!user){
+        throw new ErrorHandler(401,"Unauthorized");
+    }
+    if(user.role !== 'jobseeker'){
+        throw new ErrorHandler(403,"Only jobseekers can apply for jobs");
+    }
+    const applicant_id = user.user_id;
+    const resume = user.resume;
+
+    if(!resume){
+        throw new ErrorHandler(400,"Please upload your resume before applying for jobs");
+    }
+    const jobId = Number(req.body.jobId);
+
+
+    if (!jobId || isNaN(jobId)) {
+        throw new ErrorHandler(400, "Invalid Job ID");
+    }
+    
+
+    const [job]=await sql`select is_active from jobs WHERE job_id=${jobId}`;
+    console.log("Job fetched:", job);
+    if(!job){
+        throw new ErrorHandler(404,"Job not found");
+    }
+
+    if(!job.is_active){
+        throw new ErrorHandler(400,"Job is not active");
+    }
+
+    const now = Date.now();
+
+    const subTime = req.user?.subscription ? new Date(req.user.subscription).getTime() : 0;
+
+    const isSubscribed = subTime > now;
+
+    let newApplication;
+    const dbCheck = await sql`SELECT current_database(), current_schema();`;
+    console.log(dbCheck);
+
+     
+    try {
+        [newApplication] = await sql`
+            INSERT INTO applications (job_id, applicant_id, applicant_email, resume, subscribed)
+            VALUES (${jobId}, ${applicant_id}, ${user?.email}, ${resume}, ${isSubscribed});
+        `;
+    } catch (error:any) {
+        if(error.code === '23505'){
+            throw new ErrorHandler(409,"You have already applied for this job");
+        }
+        throw error;
+    }
+
+    res.status(201).json({message:"Job application submitted successfully",application:newApplication});
+   
+   
+
+})
+
+
+export const getAllApplications=TryCatch(async(req:AuthenticatedRequest,res)=>{
+    
+    const applications = await sql`
+        SELECT a.*,j.title AS job_title, j.salary AS job_salary, j.location AS job_location
+        FROM applications a
+        JOIN jobs j ON a.job_id = j.job_id
+        ORDER BY a.applied_at DESC
+    `
+    return res.status(200).json({applications});
+})
