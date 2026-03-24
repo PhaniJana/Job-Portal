@@ -4,6 +4,7 @@ import { sql } from './utils/db.js';
 import {createClient} from 'redis'
 dotenv.config();
 
+console.log(process.env.REDIS_URL);
 export const redisClient = createClient({
     url: process.env.REDIS_URL
 });

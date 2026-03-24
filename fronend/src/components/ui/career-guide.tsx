@@ -1,5 +1,6 @@
 'use client'
-import { CareerGuideResponse, utils_service } from '@/type'
+import { CareerGuideResponse } from '@/type'
+import { utils_service } from '@/context/AppContext'
 import axios from 'axios'
 import {  ArrowRight, BookOpen, Briefcase, Lightbulb, Loader2, Sparkles, Target, TrendingUp, X } from 'lucide-react'
 import React, { useState } from 'react'
@@ -7,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from './button'
 import { Input } from './input'
 import { Label } from './label'
+import toast from 'react-hot-toast'
 
 const CareerGuide = () => {
     const [open, setOpen] = useState(false)
@@ -31,7 +33,7 @@ const CareerGuide = () => {
     }
     const getCareerGuideance = async()=>{
         if(skills.length===0) {
-            alert('Please add at least one skill')
+            toast.error('Please add at least one skill')
             return;
         }
         setLoading(true)
@@ -40,7 +42,7 @@ const CareerGuide = () => {
             setResponse(data)
         } catch (error) {
             console.error('Error fetching career guidance:', error)
-            alert('Failed to fetch career guidance. Please try again.')
+            toast.error('Failed to fetch career guidance. Please try again.')
         }
         finally{
             setLoading(false)

@@ -9,7 +9,7 @@ import { TryCatch } from "../utils/TryCatch.js";
 export const MyProfile=TryCatch(async(req:AuthenticatedRequest,res)=>{
     const user =req.user;
 
-    return res.status(200).json({user})
+    return res.status(200).json(user)
     
 })
 

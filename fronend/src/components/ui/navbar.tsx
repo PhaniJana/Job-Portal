@@ -6,16 +6,16 @@ import { Briefcase, Home, Info, LogOutIcon, MenuIcon, User, X } from 'lucide-rea
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
 import { ModeToggle } from './mode-toggle';
+import { useAppData } from '@/context/AppContext';
 
 const NavBar = () => {
     const [isopen, setIsopen] = useState(false);
     const toggleMenu=()=>{
         setIsopen(prev=>!prev);
     }
-    const isAuth=true;
-    const logOutHandler=()=>{
-
-    }
+    
+    const {isAuth,user,setIsAuth,setUser,loading,logOutHandler} = useAppData();
+    console.log(user)
     return <nav className='z-50 stick top-0 bg-background/80 border-b backdrop:backdrop-blur-md shadow-sm'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
             <div className='flex justify-between items-center h-16'>
@@ -44,25 +44,27 @@ const NavBar = () => {
                 {/**  RIGHT SIDE ACTIONS */}
                 <div className="hidden md:flex items-center gap-3">
                     {
+                        loading? " Loading..." : <>{
                         isAuth? <Popover>
                             <PopoverTrigger asChild>
                                 <button className='flex items-center gap-2 hover:opacity-80 transition-colors'>
                                     <Avatar className='h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-blue-500/20 cursor-pointer hover:ring-blue-500/40 transition-all'>
-                                        {/*<AvatarImage src={} alt=''/>*/}
-                                        <AvatarFallback className='bg-blue-100 dark:bg-blue-900 text-blue-600'>P</AvatarFallback>
+                                        <AvatarImage src={user?.profile_pic || ''} alt={user?.name || 'User'}/>
+                                        <AvatarFallback className='bg-blue-100 dark:bg-blue-900 text-blue-600'>{user?.name?.charAt(0).toUpperCase() || 'G'}</AvatarFallback>
                                     </Avatar>
                                 </button>
                             </PopoverTrigger>
                             <PopoverContent className='w-56 p-2' align='end'>
                                 <div className='px-3 py-2 mb-2 border-b'>
-                                    <p className='text-sm font-semibold'>Phani Jana</p>
-                                    <p className='text-xs opacity-60 truncate'>phani.jana@example.com</p>
+                                    <p className='text-sm font-semibold'>{user?.name || 'John Doe'}</p>
+                                    <p className='text-xs opacity-60 truncate'>{user?.email || 'john.doe@example.com'}</p>
                                 </div>
                                 <Link href='/account'><Button className='w-full justify-start gap-2' variant={'ghost'}><User size={16}/>Account</Button></Link>
                                 <Button onClick={logOutHandler} className='w-full justify-start gap-2 mt-1' variant={'ghost'}><LogOutIcon size={16}/>Logout</Button>
                             </PopoverContent>
                         </Popover> :
                         <Link href={'/login'}><Button className='gap-2'><User size={16}/>Sign In</Button></Link>
+                    }</>
                     }
                     <ModeToggle/>    
                 </div>
