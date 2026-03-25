@@ -35,7 +35,7 @@ export const RegisterUser = TyrCatch(async(req,res,next)=>{
         const {data} = await axios.post(`${process.env.UTILS_SERVICE_URL}/api/utils/upload`,{buffer: fileBuffer});
 
         registeredUser=await sql`INSERT INTO users (name,email,password,phone_number,role,bio,resume,resume_public_id) 
-        VALUES (${name},${email},${hashedPassword},${phone_number},${role},${bio },${data.url},${data.public_id}) RETURNING user_id,name,email,phone_number,role,bio,resume,created_at`;
+        VALUES (${name},${email},${hashedPassword},${phone_number},${role},${bio},${data.url},${data.public_id}) RETURNING user_id,name,email,phone_number,role,bio,resume,created_at`;
     
     }else if(role==='recruiter'){
         registeredUser=await sql`INSERT INTO users (name,email,password,phone_number,role) 
@@ -43,7 +43,8 @@ export const RegisterUser = TyrCatch(async(req,res,next)=>{
     }
 
     const token = jwt.sign({id: registeredUser[0].user_id}, process.env.JWT_SECRET as string, {expiresIn: '7d'});
-    res.status(201).json({message:"User registered successfully",user:{email:registeredUser[0].email,name:registeredUser[0].name,role:role,token}});
+    const UserObject = registeredUser[0];
+    res.status(201).json({message:"User registered successfully", UserObject, token});
 })
 
 export const LoginUser=TyrCatch(async(req,res,next)=>{

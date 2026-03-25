@@ -10,14 +10,14 @@ import { ArrowRight, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Loading from '@/components/loading';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [btnLoading, setBtnLoading] = useState(false);
   const {isAuth,setUser,loading,setIsAuth} = useAppData();
-  if(isAuth) {
-    return redirect("/")
-  }
+  if(isAuth) return redirect("/")
+  if(loading) return <Loading/>
   const SubmitHandler = async(e: React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault();
     setBtnLoading(true);
@@ -25,12 +25,18 @@ const LoginPage = () => {
       const {data} = await axios.post(`${auth_service}/api/auth/login`,{email,password});
       toast.success(data.message);
       Cookies.set("token",data.token,{ expires: 7 ,secure:true,path:'/'});
-      setUser(data.user);
+      setUser(data.UserObject);
       setIsAuth(true);
-    } catch (error:any) {
-      toast.error(error.response?.data?.message || "Something went wrong");
-      setIsAuth(false);
-    }
+    } catch (error: unknown) {
+        let message = "Something went wrong While logging in. Please try again.";
+
+        if (axios.isAxiosError(error)) {
+          message = error.response?.data?.message || message;
+        }
+
+        toast.error(message);
+        setIsAuth(false);
+      }
     finally{
       setBtnLoading(false);
     }

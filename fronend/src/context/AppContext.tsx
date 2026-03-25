@@ -4,7 +4,7 @@ export const auth_service = 'http://localhost:3001'
 export const user_service = 'http://localhost:3002'
 export const job_service = 'http://localhost:3003'
 import { AppContextType, AppProviderProps, User } from "@/type"
-import React, { createContext, use, useContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import Cookies from "js-cookie"
 import axios from "axios"

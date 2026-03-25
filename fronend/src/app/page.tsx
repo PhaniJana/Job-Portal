@@ -1,10 +1,16 @@
-import CareerGuide from '@/components/ui/career-guide'
-import Hero from '@/components/ui/hero'
-import ResumeAnalyzer from '@/components/ui/resume-analyzer'
+'use client'
+import CareerGuide from '@/components/career-guide'
+import Hero from '@/components/hero'
+import Loading from '@/components/loading'
+import ResumeAnalyzer from '@/components/resume-analyzer'
+import { useAppData } from '@/context/AppContext'
 import React from 'react'
 
 const Page  = () => {
+  const {loading} = useAppData();
+  if(loading) return <Loading/>
   return (
+    
     <div>
       <Hero/>
       <CareerGuide/>

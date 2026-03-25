@@ -1,11 +1,11 @@
 "use client"
 import Link from 'next/link';
 import React, { useState } from 'react'
-import { Button } from './button';
+import { Button } from './ui/button';
 import { Briefcase, Home, Info, LogOutIcon, MenuIcon, User, X } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from './popover';
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
-import { ModeToggle } from './mode-toggle';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { ModeToggle } from './ui/mode-toggle';
 import { useAppData } from '@/context/AppContext';
 
 const NavBar = () => {
@@ -15,7 +15,7 @@ const NavBar = () => {
     }
     
     const {isAuth,user,setIsAuth,setUser,loading,logOutHandler} = useAppData();
-    console.log(user)
+    
     return <nav className='z-50 stick top-0 bg-background/80 border-b backdrop:backdrop-blur-md shadow-sm'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
             <div className='flex justify-between items-center h-16'>

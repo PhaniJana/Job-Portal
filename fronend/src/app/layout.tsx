@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import NavBar from "@/components/ui/navbar";
+import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { AppProvider } from "@/context/AppContext";
 
@@ -20,15 +20,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <AppProvider>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NavBar />
-            {children}
-          </ThemeProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange >
+              <NavBar />
+              {children}
+            </ThemeProvider>
           </AppProvider>
       </body>
     </html>

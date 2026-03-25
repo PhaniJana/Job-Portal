@@ -1,7 +1,8 @@
 import { ArrowRight, Briefcase, Search, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
-import { Button } from './button'
+import { Button } from './ui/button'
+import Image from 'next/image'
 
 const Hero = () => {
   return (
@@ -70,7 +71,7 @@ const Hero = () => {
                     <div className="relative group">
                         <div className="absolute -inset-4 bg-blue-400 opacity-20 blur-xl grop-hover:opacity-30 transition-opacity"></div>
                         <div className="relative rounded-2xl overflow-hidden shadow-xl border-4 border-background">
-                            <img src="/hero.jpeg" alt="" className='object-cover object-center w-full h-full transform-transition duration-500 group-hover:scale-105'/>
+                            <Image src="/hero.jpeg"  width={500} height={300} alt="" className='object-cover object-center w-full h-full transition-transform duration-500 group-hover:scale-105'/>
                         </div>
                     </div>
                 </div>
