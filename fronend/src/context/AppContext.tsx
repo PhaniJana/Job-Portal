@@ -39,6 +39,102 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
             fetchUserData();
         }
     }, [token])
+
+    const updateProfilePic =  async (formData: FormData) => {
+        setLoading(true)
+        try {
+            const {data} = await axios.put(`${user_service}/api/user/update/pic`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    
+                }
+            });
+            fetchUserData();
+            toast.success(data.message || "Profile picture updated successfully")
+        } catch (error : any) {
+            toast.error(error.response?.data?.message || "Failed to update profile picture")
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+    const updateResume =  async (formData: FormData) => {
+        setLoading(true)
+        try {
+            const {data} = await axios.put(`${user_service}/api/user/update/resume`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    
+                }
+            });
+            fetchUserData();
+            toast.success(data.message || "Resume updated successfully")
+        } catch (error : any) {
+            toast.error(error.response?.data?.message || "Failed to update resume")
+        }
+        finally {
+            setLoading(false);
+        }
+    }
+
+    const updateProfile = async (name:string,phoneNumber:string,bio:string)=>{
+        setBtnLoading(true);
+        try {
+            const {data} = await axios.put(`${user_service}/api/user/update/profile`, {
+                name,
+                phoneNumber,
+                bio
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            });
+            fetchUserData();
+            toast.success(data.message || "Profile updated successfully")
+        } catch (error : any) {
+            toast.error(error.response?.data?.message || "Failed to update profile")
+        }
+        finally {
+            setBtnLoading(false);
+        }
+
+    }
+    const AddSkill = async (skillName: string)=>{
+        setBtnLoading(true);
+        try {
+            const {data} = await axios.post(`${user_service}/api/user/skill/add`, {skillName}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            fetchUserData();
+            toast.success(data.message || "Skill added successfully")
+        } catch (error : any) {
+            toast.error(error.response?.data?.message || "Failed to add skill")
+        }
+        finally{
+            setBtnLoading(false);
+        }
+    }
+    const removeSkill = async (skillName: string)=>{
+        setBtnLoading(true);
+        try {
+            const {data} = await axios.delete(`${user_service}/api/user/skill/remove`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                data: { skillName }
+            });
+            fetchUserData();
+            toast.success(data.message || "Skill removed successfully")
+        } catch (error : any) {
+            toast.error(error.response?.data?.message || "Failed to remove skill")
+        }
+        finally{
+            setBtnLoading(false);
+        }
+    }
+
     const logOutHandler = () => {
         Cookies.remove('token');
         setUser(null);
@@ -53,8 +149,12 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
         setUser,
         setLoading,
         setIsAuth,
-        logOutHandler
-
+        logOutHandler,
+        updateProfilePic,
+        updateResume,
+        updateProfile,
+        AddSkill,
+        removeSkill
     };
 
     return (

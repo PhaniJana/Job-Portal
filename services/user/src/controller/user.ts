@@ -31,7 +31,7 @@ export const GetUserprofile = TryCatch(async(req,res)=>{
     const user = users[0];
     user.skills = user.skills || [];
 
-    res.status(200).json({user});
+    res.status(200).json(user);
 })
 
 
@@ -70,8 +70,22 @@ export const UpdateProfilePic= TryCatch(async(req:AuthenticatedRequest,res)=>{
     const oldPublicId = user.profile_pic_public_id;
 
     const fileBuffer = createBuffer(file)
-
-    const {data : uploadResult} = await axios.post<{url: string; public_id: string}>(`${process.env.MEDIA_SERVICE_URL}/api/utils/upload`,{buffer:fileBuffer.content,public_id:oldPublicId})
+    const mediaServiceUrl = process.env.MEDIA_SERVICE_URL || process.env.UTILS_SERVICE_URL;
+    if(!mediaServiceUrl){
+        throw new ErrorHandler(500,"MEDIA_SERVICE_URL is not configured");
+    }
+    let uploadResult: {url: string; public_id: string};
+    try {
+        const response = await axios.post<{url: string; public_id: string}>(
+            `${mediaServiceUrl}/api/utils/upload`,
+            {buffer:fileBuffer.content,public_id:oldPublicId}
+        );
+        uploadResult = response.data;
+    } catch (error:any) {
+        const status = error?.response?.status;
+        const msg = error?.response?.data?.message || error?.message || "Media upload failed";
+        throw new ErrorHandler(status || 502, `Media upload failed: ${msg}`);
+    }
     const updatedUsers = await sql`
         UPDATE users SET profile_pic =${uploadResult.url}, profile_pic_public_id=${uploadResult.public_id}
         WHERE user_id=${user.user_id}
@@ -95,8 +109,22 @@ export const UpdateResume= TryCatch(async(req:AuthenticatedRequest,res)=>{
     const oldPublicId = user.resume_public_id;
 
     const fileBuffer = createBuffer(file)
-
-    const {data : uploadResult} = await axios.post<{url: string; public_id: string}>(`${process.env.MEDIA_SERVICE_URL}/api/utils/upload`,{buffer:fileBuffer.content,public_id:oldPublicId})
+    const mediaServiceUrl = process.env.MEDIA_SERVICE_URL || process.env.UTILS_SERVICE_URL;
+    if(!mediaServiceUrl){
+        throw new ErrorHandler(500,"MEDIA_SERVICE_URL is not configured");
+    }
+    let uploadResult: {url: string; public_id: string};
+    try {
+        const response = await axios.post<{url: string; public_id: string}>(
+            `${mediaServiceUrl}/api/utils/upload`,
+            {buffer:fileBuffer.content,public_id:oldPublicId}
+        );
+        uploadResult = response.data;
+    } catch (error:any) {
+        const status = error?.response?.status;
+        const msg = error?.response?.data?.message || error?.message || "Media upload failed";
+        throw new ErrorHandler(status || 502, `Media upload failed: ${msg}`);
+    }
     const updatedUsers = await sql`
         UPDATE users SET resume =${uploadResult.url}, resume_public_id=${uploadResult.public_id}
         WHERE user_id=${user.user_id}
