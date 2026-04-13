@@ -24,7 +24,7 @@ const LoginPage = () => {
     try {
       const {data} = await axios.post(`${auth_service}/api/auth/login`,{email,password});
       toast.success(data.message);
-      Cookies.set("token",data.token,{ expires: 7 ,secure:true,path:'/'});
+      Cookies.set("token",data.token);
       setUser(data.UserObject);
       setIsAuth(true);
     } catch (error: unknown) {

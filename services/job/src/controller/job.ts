@@ -122,7 +122,7 @@ export const updateJob=TryCatch(async(req:AuthenticatedRequest,res)=>{
 
 export const getAllCompanyies=TryCatch(async(req:AuthenticatedRequest,res)=>{
     const companies = await sql`SELECT * FROM companies WHERE recruiter_id=${req.user?.user_id}`;
-    res.status(200).json({companies});
+    res.status(200).json(companies);
 })
 
 export const getCompanyDetails=TryCatch(async(req:AuthenticatedRequest,res)=>{
@@ -137,7 +137,7 @@ export const getCompanyDetails=TryCatch(async(req:AuthenticatedRequest,res)=>{
         throw new ErrorHandler(404,'Company not found');
     }
 
-    res.status(200).json({company});
+    res.status(200).json(company);
     
 })
 

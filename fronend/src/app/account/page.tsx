@@ -3,6 +3,7 @@ import Loading from '@/components/loading';
 import { useAppData } from '@/context/AppContext'
 import Info from './components/info';
 import Skills from './components/skills';
+import Company from './components/company';
 
 const Account = () => {
     const { isAuth, user, loading } = useAppData();
@@ -25,6 +26,9 @@ const Account = () => {
                     <Info user={user} isYourAccount={true} />
                     {
                         user.role === 'jobseeker' && <Skills user={user} isYourAccount={true} />
+                    }
+                    {
+                        user.role === 'recruiter' && (<Company />)
                     }
                 </div>
             }

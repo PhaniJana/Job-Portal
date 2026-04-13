@@ -75,10 +75,11 @@ const initDB = async()=>{
             UNIQUE(job_id, applicant_id)
             )`
             console.log("✅ Job Service Tables and Types are created successfully");
-            } catch (error) {
+    }
+    catch (error) {
                 console.error("❌ Error creating Job Service Tables and Types:", error);
                 process.exit(1);
-            }
+    }
         
 }
 
@@ -87,7 +88,7 @@ const initDB = async()=>{
 
 const port = process.env.PORT || 3003;
 initDB().then(() => {
-    app.listen(port, () => {
+    app.listen(port, () => { 
         console.log(`✅ Job service is running on port ${port}`);
     });
 })

@@ -95,3 +95,45 @@ export interface AccountProps{
     isYourAccount : boolean;
     
 }
+export interface Job{
+    job_id:number,
+    title:string,
+    description:string,
+    location:string | null,
+    salary:number | null,
+    job_type:"Full-time" | "Part-time" | "Contract" | "Internship",
+    openings:number,
+    role:string,
+    work_location: "On-site" | "Remote" | "Hybrid",
+    company_id:number,
+    posted_by_recruiter_id:number,
+    created_at:string
+    is_active:boolean
+}
+export interface Company{
+    company_id:number,
+    name:string,
+    description:string,
+    website:string,
+    logo:string
+    logo_public_id:string
+    recruiter_id:number
+    created_at:string   
+    job?:Job[]
+}
+
+type ApplicationStatus = 'Submitted' | 'Hired' | 'Rejected';
+export interface Application{
+    application_id:number,
+    job_id:number,
+    applicant_id:number,
+    applicant_email:string,
+    resume:string,
+    applied_at:string,
+    cover_letter:string,
+    status:ApplicationStatus,
+    subscribed:boolean
+    job_title:string
+    job_salary:number | null
+    job_location:string | null
+}
