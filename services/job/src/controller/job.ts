@@ -233,3 +233,5 @@ export const UpdateApplication=TryCatch(async(req:AuthenticatedRequest,res)=>{
     res.status(200).json({message:`Application for job ${job.title} updated successfully`,application:updatedApplication});
     
 })
+
+

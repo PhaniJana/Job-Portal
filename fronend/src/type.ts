@@ -99,8 +99,8 @@ export interface Job{
     job_id:number,
     title:string,
     description:string,
-    location:string | null,
-    salary:number | null,
+    location:string,
+    salary:string,
     job_type:"Full-time" | "Part-time" | "Contract" | "Internship",
     openings:number,
     role:string,
@@ -119,7 +119,7 @@ export interface Company{
     logo_public_id:string
     recruiter_id:number
     created_at:string   
-    job?:Job[]
+    jobs?:Job[]
 }
 
 type ApplicationStatus = 'Submitted' | 'Hired' | 'Rejected';

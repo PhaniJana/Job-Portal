@@ -27,6 +27,7 @@ const Company = () => {
     const [website, setWebsite] = useState("")
     const [btnLoading, setBtnLoading] = useState(false);
     const [companies, setCompanies] = useState<CompanyType[]>([]);
+    const [companyLoading, setCompanyLoading] = useState(false);
     const token = Cookies.get("token");
     const clearData =()=>{
         setName("");
@@ -36,7 +37,7 @@ const Company = () => {
     }
     const fetchCompanies = async () => {
             
-
+        setCompanyLoading(true);
         if (!token) {
             console.log("Token not found. Please log in.");
             return;
@@ -51,6 +52,9 @@ const Company = () => {
             setCompanies(data);
             } catch (error : any) {
                 console.log(error.response?.data || error.message);
+            }
+            finally{
+                setCompanyLoading(false);
             }
         };
     useEffect(() => {
@@ -140,12 +144,15 @@ const Company = () => {
             </div>
             
             </div>
-            <div className="p-6">
-                {
-                    companies?.length>0 ? <div className="grid grid-cols-1">
-                        {
-                            companies.map((c,i)=>(
-                                <div key={i} className="flex items-center gap-4 p-4 rounded-lg border-2 hover:border-blue-500 transition-all bg-background">
+            { companyLoading ? (
+                    <Loading />
+            ) : (
+                <div className="p-6">
+                    {
+                        companies?.length>0 ? <div className="grid grid-cols-1">
+                            {
+                                companies.map((c,i)=>(
+                                    <div key={i} className="flex items-center gap-4 p-4 rounded-lg border-2 hover:border-blue-500 transition-all bg-background">
                                     <div className="h-16 w-16 rounded-full border-full overflow-hidden shrink-0 bg-background">
                                         <img src={c.logo} alt={c.name} className='h-full w-full object-cover'/>
                                     </div>
@@ -186,7 +193,7 @@ const Company = () => {
                     </div>
                     </>
                 }
-            </div>
+            </div>)}
         </Card>
         <Dialog>
             <DialogTrigger asChild>
