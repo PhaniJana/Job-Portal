@@ -3,7 +3,7 @@ export const utils_service = 'http://localhost:3005'
 export const auth_service = 'http://localhost:3001'
 export const user_service = 'http://localhost:3002'
 export const job_service = 'http://localhost:3003'
-import { AppContextType, AppProviderProps, User } from "@/type"
+import { AppContextType, Application, AppProviderProps, User } from "@/type"
 import React, { createContext, useContext, useEffect, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import Cookies from "js-cookie"
@@ -33,12 +33,29 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
             setLoading(false);
         }
     }
+
+    const [applications, setApplications] = useState<Application[]>([])
+
+    const fetchApplications = async () => {
+        try {
+            const {data} = await axios.get<Application[]>(`${user_service}/api/user/application/all`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setApplications(data);
+        } catch (error) {
+            console.log(error)
+        } 
+    }
     useEffect(() => {
         if (token) {
             setLoading(true);
             fetchUserData();
+            fetchApplications();
+
         }
-    }, [token])
+    }, [])
 
     const updateProfilePic =  async (formData: FormData) => {
         setLoading(true)
@@ -51,13 +68,15 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
             });
             fetchUserData();
             toast.success(data.message || "Profile picture updated successfully")
-        } catch (error : any) {
-            toast.error(error.response?.data?.message || "Failed to update profile picture")
+        } catch (error ) {
+            console.log(error);
+            toast.error("Failed to update profile picture")
         }
         finally {
             setLoading(false);
         }
     }
+
     const updateResume =  async (formData: FormData) => {
         setLoading(true)
         try {
@@ -69,8 +88,9 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
             });
             fetchUserData();
             toast.success(data.message || "Resume updated successfully")
-        } catch (error : any) {
-            toast.error(error.response?.data?.message || "Failed to update resume")
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to update resume")
         }
         finally {
             setLoading(false);
@@ -91,14 +111,16 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
             });
             fetchUserData();
             toast.success(data.message || "Profile updated successfully")
-        } catch (error : any) {
-            toast.error(error.response?.data?.message || "Failed to update profile")
+        } catch (error ) {
+            console.log(error)
+            toast.error("Failed to update profile")
         }
         finally {
             setBtnLoading(false);
         }
 
     }
+
     const AddSkill = async (skillName: string)=>{
         setBtnLoading(true);
         try {
@@ -109,13 +131,15 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
             });
             fetchUserData();
             toast.success(data.message || "Skill added successfully")
-        } catch (error : any) {
-            toast.error(error.response?.data?.message || "Failed to add skill")
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to add skill")
         }
         finally{
             setBtnLoading(false);
         }
     }
+
     const removeSkill = async (skillName: string)=>{
         setBtnLoading(true);
         try {
@@ -127,8 +151,9 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
             });
             fetchUserData();
             toast.success(data.message || "Skill removed successfully")
-        } catch (error : any) {
-            toast.error(error.response?.data?.message || "Failed to remove skill")
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to remove skill")
         }
         finally{
             setBtnLoading(false);
@@ -141,6 +166,29 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
         setIsAuth(false);
         toast.success("Logged out successfully")
     }
+
+    const applyJob = async(job_id: number) => {
+        setBtnLoading(true);
+        try {
+            const {data} = await axios.post(
+                `${user_service}/api/user/apply`,
+                { jobId: job_id },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            toast.success(data.message || "Applied for job successfully")
+            fetchApplications();
+        } catch (error) {
+            console.log(error)
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.message || "Failed to apply for job")
+            } else {
+                toast.error("Failed to apply for job")
+            }
+        } finally{
+            setBtnLoading(false);
+        }
+    }
+
     const value: AppContextType = {
         user,
         loading,
@@ -154,7 +202,10 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
         updateResume,
         updateProfile,
         AddSkill,
-        removeSkill
+        removeSkill,
+        applyJob,
+        applications,
+        fetchApplications
     };
 
     return (

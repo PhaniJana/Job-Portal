@@ -15,7 +15,7 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [btnLoading, setBtnLoading] = useState(false);
-  const {isAuth,setUser,loading,setIsAuth} = useAppData();
+  const {isAuth,setUser,loading,setIsAuth,fetchApplications} = useAppData();
   if(isAuth) return redirect("/")
   if(loading) return <Loading/>
   const SubmitHandler = async(e: React.FormEvent<HTMLFormElement>)=>{
@@ -27,6 +27,7 @@ const LoginPage = () => {
       Cookies.set("token",data.token);
       setUser(data.UserObject);
       setIsAuth(true);
+      fetchApplications();
     } catch (error: unknown) {
         let message = "Something went wrong While logging in. Please try again.";
 

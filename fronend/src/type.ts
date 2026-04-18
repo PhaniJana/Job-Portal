@@ -84,6 +84,10 @@ export interface AppContextType{
     updateProfile:(name: string, phoneNumber: string, bio: string) => Promise<void>
     AddSkill:(skillName:string)=>Promise<void>
     removeSkill:(skillName:string)=>Promise<void>
+    applyJob:(job_id:number)=>Promise<void>
+    applications: Application[]
+    fetchApplications: () => Promise<void>
+
 }
 
 export interface AppProviderProps{
@@ -109,6 +113,8 @@ export interface Job{
     posted_by_recruiter_id:number,
     created_at:string
     is_active:boolean
+    company_name:string
+    company_logo:string
 }
 export interface Company{
     company_id:number,

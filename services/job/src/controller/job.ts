@@ -146,7 +146,7 @@ export const getAllActiveJobs=TryCatch(async(req:AuthenticatedRequest,res)=>{
     const {title,location} = req.query as {title?:string,location?:string};
 
     let queryStr = `select j.job_id,j.title,j.description,j.salary,j.location,j.job_type,
-    j.work_location,j.created_at,c.name AS company_name, c.logo AS company_logo FROM 
+    j.work_location,j.created_at,c.name AS company_name, c.logo AS company_logo, c.company_id AS company_id FROM 
     jobs j JOIN companies c ON j.company_id = c.company_id WHERE j.is_active = true`;
 
     const values =[];
@@ -164,7 +164,7 @@ export const getAllActiveJobs=TryCatch(async(req:AuthenticatedRequest,res)=>{
     queryStr += ` ORDER BY j.created_at DESC`;
     const jobs = (await sql.query(queryStr,values)) as any[]
 
-    res.status(200).json({jobs});
+    res.status(200).json(jobs);
 })
 
 

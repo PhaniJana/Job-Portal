@@ -255,5 +255,5 @@ export const getAllApplications=TryCatch(async(req:AuthenticatedRequest,res)=>{
         JOIN jobs j ON a.job_id = j.job_id
         ORDER BY a.applied_at DESC
     `
-    return res.status(200).json({applications});
+    return res.status(200).json(applications);
 })

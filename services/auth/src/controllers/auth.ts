@@ -7,7 +7,9 @@ import axios from "axios";
 import jwt from "jsonwebtoken";
 import { forgotPasswordTemplate } from "../template.js";
 import { publishTopic } from "../producer.js";
-import { redisClient } from "../index.js";             
+import { redisClient } from "../index.js";
+import dotenv from 'dotenv';
+dotenv.config();             
 export const RegisterUser = TyrCatch(async(req,res,next)=>{
     const{name,email,password,phone_number,role,bio}=req.body;
 
@@ -105,7 +107,7 @@ export const forgotPassword=TyrCatch(async(req,res,next)=>{
         email :user.email,
         type:'reset'
     },process.env.JWT_SECRET as string,{expiresIn:'15m'})
-
+    
     const resetLink = `${process.env.FRONTEND_URL}/reset/${resetToken}`;
     await redisClient.set(`forgot${email}`,resetToken,{
         EX: 15 * 60
