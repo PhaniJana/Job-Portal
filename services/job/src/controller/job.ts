@@ -172,7 +172,13 @@ export const getAllActiveJobs=TryCatch(async(req:AuthenticatedRequest,res)=>{
 export const GetSingleJob = TryCatch(async(req:AuthenticatedRequest,res)=>{
     const {jobId} = req.params;
 
-    const [job] = await sql`SELECT * FROM jobs WHERE job_id=${jobId} `;
+    const [job] = await sql`
+        SELECT
+            *,
+            posted_by_recuriter_id AS posted_by_recruiter_id
+        FROM jobs
+        WHERE job_id=${jobId}
+    `;
     if(!job){
         throw new ErrorHandler(404,'Job not found');
     }

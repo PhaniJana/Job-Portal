@@ -2,20 +2,21 @@ import { Card } from '@/components/ui/card'
 import { AccountProps } from '@/type'
 import React, { useRef, useState } from 'react'
 import Image from 'next/image'
-import {  Camera, Edit, FileText, Mail, NotepadText, Phone, UserIcon } from 'lucide-react'
+import {  AlertTriangle, Camera, Check, CheckCircle2, Crown, Edit, FileText, Mail, NotepadText, Phone, RefreshCcw, UserIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useAppData } from '@/context/AppContext'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { useRouter } from 'next/navigation'
 
 const Info : React.FC<AccountProps> = ({ user, isYourAccount }) => {
   
   const inputRef = useRef<HTMLInputElement | null>(null);
   const editRef = useRef<HTMLButtonElement | null>(null);
   const resumeRef = useRef<HTMLInputElement | null>(null);
-
+  const router = useRouter();
   const [name,setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [bio, setBio] = useState("");
@@ -23,6 +24,9 @@ const Info : React.FC<AccountProps> = ({ user, isYourAccount }) => {
   const HandleClick = ()=>{
     inputRef.current?.click();
   }
+  const [now] = useState(() => Date.now());
+
+  const isActive =user && user.subscription &&  new Date(user.subscription).getTime() > now;
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>)=>{
     const file = e.target.files?.[0];
     if(file) {
@@ -161,6 +165,61 @@ const Info : React.FC<AccountProps> = ({ user, isYourAccount }) => {
                 }
               </div>
               </div>}
+              {/**subscription section */}
+              {
+                isYourAccount && <>
+                  {
+                    user.role ==='jobseeker' && <div className="mt-8">
+                      <h2 className="text-lg font-semibold mt-4 flex items-center gap-2">
+                        <Crown size={20} className='text-blue-600' />
+                        Subscription Status
+                      </h2>
+                      <div className="p-6 rounded-lg bg-linear-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 to-purple-900/20">
+                      {
+                        !user.subscription ? <>
+                          <div className="flex items-center justify-between flex-wrap gap-4">
+                            <div className="">
+                              <p className="font-semibold text-lg mb-1">No Active Subscription</p>
+                              <p className='text-sm opacity-70'>Subscribe to unlock Premium Features</p>
+                            </div>
+                            <Button className='gap-2' onClick={() => router.push('/subscribe')}>
+                              <Crown size={18} /> Subscribe
+                            </Button>
+                          </div>
+                        </> : isActive ? <div className="flex items-center justify-between flex-wrap gap-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                            <CheckCircle2 size={16} className='text-green-600' />
+                            <p className="font-semibold text-lg text-green-600 ">Active Subscription</p>
+                          </div>
+                          <p className="text-sm opacity-70">Valid Until: {user.subscription && new Date(user.subscription).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                          </div>
+                            <div className="flex items-center gap-2 rounded-full bg-green-700 text-white font-medium">
+                              <CheckCircle2 size={16} />
+                              Subscribed
+                            </div>
+                        </div> : <>
+                          <div className="flex items-center justify-between flex-wrap gap-4">
+                            <div className="">
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle size={16} className='text-red-600' />
+                                <p className="font-semibold text-lg text-red-600">Subscription Expired</p>
+                              </div>
+                              <p className="text-sm opacity-70">
+                                Expired on :{" "} {user.subscription && new Date(user.subscription).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                              </p>
+                            </div>
+                            <Button variant={'destructive'} className='gap-2' onClick={() => router.push('/subscribe')}>
+                              <RefreshCcw size={18} /> Renew Subscription
+                            </Button>
+                          </div>
+                        </>
+                      }
+                      </div>
+                    </div>
+                  }
+                </>
+              }
         </div>
       </Card>
       {/* Dialog Box for Edit */}

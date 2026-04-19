@@ -8,6 +8,7 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
 import Cookies from "js-cookie"
 import axios from "axios"
+import { redirect } from "next/navigation"
 const AppContext = createContext<AppContextType | undefined>(undefined)
 
 export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
@@ -164,6 +165,7 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
         Cookies.remove('token');
         setUser(null);
         setIsAuth(false);
+        redirect('/')
         toast.success("Logged out successfully")
     }
 

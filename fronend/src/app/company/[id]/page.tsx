@@ -15,6 +15,7 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Image from 'next/image';
 const CompanyPage = () => {
     const {id} = useParams();
     const token = Cookies.get('token'); 
@@ -166,7 +167,7 @@ const CompanyPage = () => {
                     <div className="px-8 pb-8">
                         <div className="flex flex-col md:flex-row gap-6 items-start md:items-end -mt-16">
                             <div className="w-32 h-32 rounded-2xl border-4 border-background overflow-hidden shadow-xl bg-background shrink-0">
-                                <img src={company.logo} alt='' className='w-full h-full object-cover'/>
+                                <Image src={company.logo} alt='' width={50} height={50} className='w-full h-full object-cover'/>
                             </div>
                             <div className="flex-1 md:mb-4">
                                 <h1 className='text-3xl font-bold mb-2'>
@@ -314,7 +315,7 @@ const CompanyPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <Link href={`/job/${job.job_id}`}>
+                                                    <Link href={`/jobs/${job.job_id}`}>
                                                         <Button variant={'outline'} size={'sm'} className='gap-1'>
                                                             <Eye size={16}/>
                                                             View Details

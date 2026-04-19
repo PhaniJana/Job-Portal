@@ -7,13 +7,14 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Loading from '@/components/loading';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
-import { Briefcase, Building, Building2, EyeIcon, FileText, Globe, Image, Plus, Trash2 } from 'lucide-react';
+import { Briefcase, Building2, EyeIcon, FileText,Image, Globe, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Company as CompanyType } from '@/type';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import Img  from 'next/image';
 const Company = () => {
     const {loading} = useAppData();
 
@@ -50,8 +51,9 @@ const Company = () => {
                 },
             });
             setCompanies(data);
-            } catch (error : any) {
-                console.log(error.response?.data || error.message);
+            } catch (error ) {
+                toast.error("Failed to fetch companies");
+                console.log(error);
             }
             finally{
                 setCompanyLoading(false);
@@ -86,12 +88,12 @@ const Company = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            toast.success("Company added successfully");
+            toast.success(data.message || "Company added successfully");
             fetchCompanies();
             clearData();
             
-        } catch (error : any) {
-            console.log(error.response?.data || error.message);
+        } catch (error) {
+            console.log(error);
             toast.error("Failed to add company");
         }finally{
             setBtnLoading(false);
@@ -112,8 +114,8 @@ const Company = () => {
             toast.success(data.message || "Company deleted successfully");
             fetchCompanies();
             
-        } catch (error : any) {
-            console.log(error.response?.data || error.message);
+        } catch (error) {
+            console.log(error);
             toast.error("Failed to delete company");
         }
         finally{
@@ -154,7 +156,7 @@ const Company = () => {
                                 companies.map((c,i)=>(
                                     <div key={i} className="flex items-center gap-4 p-4 rounded-lg border-2 hover:border-blue-500 transition-all bg-background">
                                     <div className="h-16 w-16 rounded-full border-full overflow-hidden shrink-0 bg-background">
-                                        <img src={c.logo} alt={c.name} className='h-full w-full object-cover'/>
+                                        <Img width={45} height={45} src={c.logo} alt={c.name} className='h-full w-full object-cover'/>
                                     </div>
                                     {/**Company Info */}
                                     <div className="flex-1 min-w-0">
