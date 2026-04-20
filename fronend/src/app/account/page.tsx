@@ -5,9 +5,10 @@ import Info from './components/info';
 import Skills from './components/skills';
 import Company from './components/company';
 import Link from 'next/link';
+import AppliedJobs from './components/appliedJobs';
 
 const Account = () => {
-    const { isAuth, user, loading } = useAppData();
+    const { isAuth, user, loading,applications } = useAppData();
 
     if (loading) return <Loading />
 
@@ -30,6 +31,9 @@ const Account = () => {
                     <Info user={user} isYourAccount={true} />
                     {
                         user.role === 'jobseeker' && <Skills user={user} isYourAccount={true} />
+                    }
+                    {
+                        user.role === 'jobseeker' && applications && <AppliedJobs applications={applications} />
                     }
                     {
                         user.role === 'recruiter' && (<Company />)

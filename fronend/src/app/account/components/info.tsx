@@ -194,7 +194,7 @@ const Info : React.FC<AccountProps> = ({ user, isYourAccount }) => {
                           </div>
                           <p className="text-sm opacity-70">Valid Until: {user.subscription && new Date(user.subscription).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                           </div>
-                            <div className="flex items-center gap-2 rounded-full bg-green-700 text-white font-medium">
+                            <div className="flex items-center gap-2 rounded-full px-3 py-1 bg-green-700 text-white font-medium">
                               <CheckCircle2 size={16} />
                               Subscribed
                             </div>

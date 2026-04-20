@@ -1,8 +1,9 @@
 "use client"
-export const utils_service = 'http://localhost:3005'
-export const auth_service = 'http://localhost:3001'
-export const user_service = 'http://localhost:3002'
-export const job_service = 'http://localhost:3003'
+export const utils_service = process.env.NEXT_PUBLIC_UTILS_SERVICE || 'http://localhost:3005'
+export const auth_service = process.env.NEXT_PUBLIC_AUTH_SERVICE || 'http://localhost:3001'
+export const user_service = process.env.NEXT_PUBLIC_USER_SERVICE || 'http://localhost:3002'
+export const job_service = process.env.NEXT_PUBLIC_JOB_SERVICE || 'http://localhost:3003'
+export const payment_service = process.env.NEXT_PUBLIC_PAYMENT_SERVICE || 'http://localhost:3004'
 import { AppContextType, Application, AppProviderProps, User } from "@/type"
 import React, { createContext, useContext, useEffect, useState } from "react"
 import toast, { Toaster } from "react-hot-toast"
@@ -212,8 +213,9 @@ export const AppProvider:React.FC<AppProviderProps> = ({children})=>{
 
     return (
         <AppContext.Provider value={value}>
-            {children}
             <Toaster/>
+            {children}
+            
         </AppContext.Provider>
     );
 }
