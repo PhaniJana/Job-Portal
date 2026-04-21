@@ -41,7 +41,7 @@ const RegisterPage = () => {
     try {
       const {data} = await axios.post(`${auth_service}/api/auth/register`, formData, );
       toast.success(data.message);
-      Cookies.set("token",data.token,{ expires: 7 ,secure:true,path:'/'});
+      Cookies.set("token",data.token,{ expires: 7 ,secure:false,path:'/'});
       setUser(data.UserObject);
       setIsAuth(true);
     } catch (error: unknown) {
